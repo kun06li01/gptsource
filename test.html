@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能车牌监控系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind配置 -->
+    <script>
+		tailwind.config = {
+			theme: {
+				extend: {
+					colors: {
+						primary: '#165DFF',
+						secondary: '#722ED1',
+						accent: '#0FC6C2',
+						dark: '#0D1117',
+						'dark-glass': 'rgba(13, 17, 23, 0.7)',
+						'light-glass': 'rgba(255, 255, 255, 0.05)',
+						'card-bg': 'rgba(255, 255, 255, 0.03)',
+					},
+					fontFamily: {
+						inter: ['Inter', 'sans-serif'],
+					},
+					animation: {
+						'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+						'float': 'float 6s ease-in-out infinite',
+						'glow': 'glow 2s ease-in-out infinite alternate',
+						'flow': 'flow 15s linear infinite',
+						'orbit': 'orbit 30s linear infinite',
+						'fade-in': 'fadeIn 0.5s ease-in-out',
+						'slide-up': 'slideUp 0.5s ease-out',
+					},
+					keyframes: {
+						float: {
+							'0%, 100%': { transform: 'translateY(0)' },
+							'50%': { transform: 'translateY(-10px)' },
+						},
+						glow: {
+							'0%': { boxShadow: '0 0 5px rgba(15, 198, 194, 0.5), 0 0 10px rgba(15, 198, 194, 0.3)' },
+							'100%': { boxShadow: '0 0 10px rgba(15, 198, 194, 0.8), 0 0 20px rgba(15, 198, 194, 0.5)' },
+						},
+						flow: {
+							'0%': { backgroundPosition: '0 0' },
+							'100%': { backgroundPosition: '0 -1000px' }
+						},
+						orbit: {
+							'0%': { transform: 'rotate(0deg)' },
+							'100%': { transform: 'rotate(360deg)' }
+						},
+						fadeIn: {
+							'0%': { opacity: '0' },
+							'100%': { opacity: '1' },
+						},
+						slideUp: {
+							'0%': { transform: 'translateY(20px)', opacity: '0' },
+							'100%': { transform: 'translateY(0)', opacity: '1' },
+						}
+					}
+				}
+			}
+		}
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .text-glow {
+                text-shadow: 0 0 10px rgba(15, 198, 194, 0.5), 0 0 20px rgba(15, 198, 194, 0.3);
+            }
+            .bg-grid {
+                background-image: linear-gradient(rgba(22, 93, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(22, 93, 255, 0.05) 1px, transparent 1px);
+                background-size: 30px 30px;
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .scrollbar-hidden::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hidden {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .neon-border {
+                box-shadow: 0 0 5px rgba(15, 198, 194, 0.5),
+                0 0 10px rgba(15, 198, 194, 0.3);
+            }
+            .neon-glow {
+                animation: glow 2s ease-in-out infinite alternate;
+            }
+            .bg-circuit {
+                background-image:
+                        radial-gradient(circle at 10% 20%, rgba(15, 198, 194, 0.05) 0%, transparent 20%),
+                        radial-gradient(circle at 80% 30%, rgba(114, 46, 209, 0.05) 0%, transparent 25%),
+                        radial-gradient(circle at 40% 70%, rgba(22, 93, 255, 0.05) 0%, transparent 25%);
+            }
+            .bg-matrix {
+                background-image:
+                        radial-gradient(circle at 10% 20%, rgba(15, 198, 194, 0.1) 0%, transparent 30%),
+                        radial-gradient(circle at 80% 30%, rgba(114, 46, 209, 0.1) 0%, transparent 35%),
+                        radial-gradient(circle at 40% 70%, rgba(22, 93, 255, 0.1) 0%, transparent 35%);
+            }
+            .grid-flow {
+                background-image:
+                        linear-gradient(rgba(15, 198, 194, 0.05) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(114, 46, 209, 0.05) 1px, transparent 1px);
+                background-size: 100px 100px;
+                animation: flow 15s linear infinite;
+            }
+            .particles {
+                position: relative;
+                overflow: hidden;
+            }
+            .particles::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image:
+                        radial-gradient(circle, rgba(15, 198, 194, 0.1) 1px, transparent 1px),
+                        radial-gradient(circle, rgba(114, 46, 209, 0.1) 1px, transparent 1px);
+                background-size: 50px 50px;
+                background-position: 0 0;
+                animation: flow 30s linear infinite;
+            }
+            .orbit-container {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                z-index: -1;
+            }
+            .orbit-path {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                border-radius: 50%;
+                border: 1px solid rgba(15, 198, 194, 0.1);
+                transform-origin: center;
+            }
+            .orbit-dot {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                border-radius: 50%;
+                background-color: rgba(15, 198, 194, 0.6);
+                box-shadow: 0 0 10px rgba(15, 198, 194, 0.8);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .plate-card {
+                position: relative;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            }
+            .plate-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+                animation: shine 3s infinite linear;
+            }
+            @keyframes shine {
+                100% {
+                    left: 100%;
+                }
+            }
+            .pulse-dot {
+                position: relative;
+            }
+            .pulse-dot::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background-color: currentColor;
+                animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+            }
+            @keyframes pulse-ring {
+                0% {
+                    transform: scale(0.5);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-dark min-h-screen flex items-center justify-center p-4 overflow-hidden font-inter particles">
+<!-- 背景效果 -->
+<div class="fixed inset-0 bg-grid grid-flow z-0"></div>
+<div class="fixed inset-0 z-0 overflow-hidden bg-matrix">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full filter blur-[100px] animate-pulse-slow"></div>
+    <div class="absolute bottom-1/3 right-1/4 w-80 h-80 bg-secondary/20 rounded-full filter blur-[100px] animate-pulse-slow" style="animation-delay: 1.5s"></div>
+    <div class="absolute top-2/3 left-1/2 w-64 h-64 bg-accent/10 rounded-full filter blur-[80px] animate-pulse-slow" style="animation-delay: 3s"></div>
+</div>
+
+<!-- 主容器 -->
+<div class="relative z-10 w-full max-w-[728px] glass-effect rounded-2xl border border-light-glass/30 overflow-hidden">
+    <!-- 顶部标题 -->
+    <div class="bg-gradient-to-r from-primary/30 via-secondary/30 to-accent/30 py-4 px-6 flex items-center justify-between border-b border-light-glass/30">
+        <h1 class="text-[clamp(1.2rem,3vw,1.8rem)] font-bold text-white text-glow flex items-center">
+            <i class="fa fa-car mr-3"></i>智能车牌监控系统
+        </h1>
+        <div class="flex items-center space-x-4">
+            <div class="bg-light-glass rounded-lg px-3 py-1.5 flex items-center">
+                <span class="text-white/70 text-sm mr-2">当前时间:</span>
+                <span id="current-time" class="text-accent font-mono text-lg text-glow">--:--:--</span>
+            </div>
+            <div class="bg-green-500/10 text-green-400 px-3 py-1.5 rounded-lg text-sm font-medium flex items-center">
+                <i class="fa fa-check-circle mr-1.5"></i>系统正常
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区 -->
+    <div class="flex flex-col md:flex-row h-[calc(100%-12rem)]">
+        <!-- 左侧：车牌列表 -->
+        <div class="w-full p-4 overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-white text-lg font-semibold">最近进场记录</h2>
+                <div class="bg-light-glass rounded-lg px-3 py-1.5 text-white/70 text-sm flex items-center">
+                    <i class="fa fa-refresh mr-1.5"></i>
+                    <span>实时更新</span>
+                </div>
+            </div>
+
+            <div id="plate-list" class="space-y-3 h-[728px] overflow-y-hidden scrollbar-hidden">
+                <!-- 列表内容将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部状态栏 -->
+    <div class="bg-dark-glass py-2 px-5 flex justify-between items-center text-white/50 text-xs border-t border-light-glass/30">
+        <div>数据更新: 实时</div>
+        <div>版本: v2.5.0</div>
+        <div>© 2025 智能交通系统</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script>
+	// 生成随机车牌号
+	function generateRandomPlate() {
+		const firstChars = '京津冀晋蒙辽吉黑沪苏浙皖闽赣鲁豫鄂湘粤桂琼川贵云藏陕甘青宁新';
+		const firstChar = firstChars.charAt(Math.floor(Math.random() * firstChars.length));
+		const secondChar = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+		const restChars = Array(5).fill('').map(() =>
+				Math.random() > 0.3 ? String(Math.floor(Math.random() * 10)) :
+						String.fromCharCode(65 + Math.floor(Math.random() * 10))
+		).join('');
+		return `${firstChar}${secondChar}${restChars}`;
+	}
+
+	// 生成随机时间（最近2小时内）
+	function generateRandomTime() {
+		const now = new Date();
+		const randomMinutes = Math.floor(Math.random() * 120); // 0-119分钟前
+		now.setMinutes(now.getMinutes() - randomMinutes);
+
+		const hours = now.getHours().toString().padStart(2, '0');
+		const minutes = now.getMinutes().toString().padStart(2, '0');
+		const seconds = now.getSeconds().toString().padStart(2, '0');
+		return `${hours}:${minutes}:${seconds}`;
+	}
+
+	// 生成随机车辆类型
+	function generateRandomType() {
+		const types = ['普通车辆', 'VIP车辆', '临时车辆', '会员车辆'];
+		return types[Math.floor(Math.random() * types.length)];
+	}
+
+	// 生成随机颜色类
+	function generateRandomColorClass() {
+		const colors = ['bg-blue-600', 'bg-green-600', 'bg-yellow-600', 'bg-purple-600', 'bg-pink-600'];
+		return colors[Math.floor(Math.random() * colors.length)];
+	}
+
+	// 渲染车牌列表
+	function renderPlateList() {
+		const plateList = document.getElementById('plate-list');
+		plateList.innerHTML = '';
+
+		// 生成20条随机数据
+		for (let i = 0; i < 20; i++) {
+			const plateNumber = generateRandomPlate();
+			const entryTime = generateRandomTime();
+			const vehicleType = generateRandomType();
+			const colorClass = generateRandomColorClass();
+
+			// 创建列表项
+			const plateItem = document.createElement('div');
+			plateItem.className = 'plate-card rounded-lg p-3 card-hover animate-slide-up';
+			plateItem.style.animationDelay = `${i * 0.05}s`;
+
+			plateItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 ${colorClass} rounded flex items-center justify-center text-white text-xs font-bold mr-3">
+                                <i class="fa fa-car"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">${plateNumber}</p>
+                                <p class="text-white/50 text-xs">${vehicleType}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-accent text-sm">${entryTime}</p>
+                            <p class="text-green-400 text-xs flex items-center justify-end">
+                                <span class="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+                                已入场
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+			plateList.appendChild(plateItem);
+		}
+	}
+
+	// 更新当前时间
+	function updateCurrentTime() {
+		const now = new Date();
+		const hours = now.getHours().toString().padStart(2, '0');
+		const minutes = now.getMinutes().toString().padStart(2, '0');
+		const seconds = now.getSeconds().toString().padStart(2, '0');
+		document.getElementById('current-time').textContent = `${hours}:${minutes}:${seconds}`;
+	}
+
+	// 页面加载完成后初始化
+	document.addEventListener('DOMContentLoaded', () => {
+		renderPlateList();
+		updateCurrentTime();
+		setInterval(updateCurrentTime, 1000);
+
+		// 定时添加新记录
+		setInterval(() => {
+			const plateList = document.getElementById('plate-list');
+			const plateNumber = generateRandomPlate();
+			const entryTime = generateRandomTime();
+			const vehicleType = generateRandomType();
+			const colorClass = generateRandomColorClass();
+
+			// 创建新记录
+			const newItem = document.createElement('div');
+			newItem.className = 'plate-card rounded-lg p-3 card-hover animate-slide-up';
+
+			newItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 ${colorClass} rounded flex items-center justify-center text-white text-xs font-bold mr-3">
+                                <i class="fa fa-car"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">${plateNumber}</p>
+                                <p class="text-white/50 text-xs">${vehicleType}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-accent text-sm">${entryTime}</p>
+                            <p class="text-green-400 text-xs flex items-center justify-end">
+                                <span class="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+                                已入场
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+			// 添加到列表顶部
+			plateList.insertBefore(newItem, plateList.firstChild);
+
+			// 保持列表长度不超过20条
+			if (plateList.children.length > 20) {
+				plateList.removeChild(plateList.lastChild);
+			}
+		}, 5000);
+	});
+</script>
+</body>
+</html>
